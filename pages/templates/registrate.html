@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Реєстрація</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #eee;
+            margin: 0;
+        }
+        .regist-box {
+            border: 4px solid #000;
+            border-radius: 10px;
+            padding: 20px;
+            background: #fff;
+            width: 260px;
+            text-align: center;
+        }
+        button{
+            color: cyan;
+            border: 2px black;
+        }
+        </style>
+        </head>
+<body>
+<div class="regist-box">
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Зареєструватися</button>
+</form>
+</div>
+</body>
+</html>
