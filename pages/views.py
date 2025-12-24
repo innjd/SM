@@ -27,4 +27,4 @@ class RegistrateView(CreateView):
 
 class ItemListView(TemplateView):
     template_name = 'main.html'
-
+    

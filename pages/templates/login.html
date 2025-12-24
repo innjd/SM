@@ -21,7 +21,6 @@
             text-align: center;
         }
         button{
-            color: cyan;
             border: 2px black;
         }
     </style>
@@ -38,6 +37,7 @@
 {% if error %}
     <p style="color:red;">{{ error }}</p>
 {% endif %}
-<a href = "{% url 'registrate' %}">Register</a>
+<a>Не маєте аккаунт?</a>
+<a href = "{% url 'registrate' %}">Зареєструватись</a>
    </div>
 </body
