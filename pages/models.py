@@ -7,7 +7,7 @@ class User(models.Model):
 class Post_Item(models.Model):
     upload_video = models.FileField(upload_to='uploads/', blank=True, null=True)
     image = models.ImageField(upload_to='images/', blank=True, null=True)
-
+    text= models.CharField(max_length=1000)
 # class Profile(models.Model):
 #     icon =
 #     name = 

@@ -7,4 +7,3 @@ class UploadPost_ItemForm(forms.Form):
     text = forms.CharField()
     image = forms.FileField(required=False)
     file = forms.FileField(required=False)
-    # cocreator = 
