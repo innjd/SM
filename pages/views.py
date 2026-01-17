@@ -1,6 +1,6 @@
 from django.views.generic import FormView, CreateView, ListView, TemplateView
-from .forms import LoginForm
-from .models import Post_Item
+from .forms import *
+from .models import *
 from django.urls import reverse_lazy
 from django.shortcuts import redirect, get_object_or_404
 from django.shortcuts import render, redirect 
@@ -30,7 +30,8 @@ class RegistrateView(CreateView):
 
 class ItemListView(TemplateView):
     template_name = 'main.html'
-
+class ChatsListView(TemplateView):
+    template_name = 'chats.html'
 
 @login_required
 def delete_item(request, pk):
@@ -38,3 +39,20 @@ def delete_item(request, pk):
     if request.method == "POST":
         item.delete()
     return redirect('edit_item_list')
+
+def LogoutView(request):
+    logout(request)
+    return redirect('login')
+
+def chat_users_list(request):
+    query = request.GET.get("q", "").strip()
+    users = User.objects.all().order_by("-id")
+    if query:
+        users = users.filter(
+            username__icontains=query
+        )
+
+    return render(request, "chats.html", {
+        "users": users,
+        "query": query
+    })

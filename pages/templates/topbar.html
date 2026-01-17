@@ -1,24 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        .top_bar_body{ 
-            background: white;
-            
-        }
+{% load static %}
+
+<style>     
+#navbar {
+  background-color: #d50d0d;
+  position: sticky;
+  top: 0;
+  overflow: hidden;
+display: flex;
+align-items: center;
+padding: 0 20px;
+gap: 20px;
+}
+
+#navbar a {
+color: white;
+text-align: center;
+padding: 14px 16px;
+text-decoration: none;
+font-size: 17px;
+border-radius: 4px;
+transition: background-color 0.3s;
+}
+
+#navbar a:hover {
+background-color: #b80a0a;
+}
     </style>
-</head>
 <body>
-    <div class="top_bar_body">
+    <div id="navbar">
         <a href="{% url 'settings'  %}">⚙️</a>
-        <a href="{% url 'chats'  %}">
-        <img src="pages\static\chat_image.png" alt="" style="width:100px; height:auto;">
-        </a>
-        <a href="{% url 'main_page'  %}">Ⓜ️🅰️ℹ️n</a>
-        
+        <a href="{% url 'chats'  %}"><img src="pages\static\chat_image.png" alt="" style="width:100px; height:auto;"></a>
+        <a href="{% url 'main_page'  %}">Main</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}">Log out</a>
+            
+        {% else %}
+            <a href="{% url 'login' %}">Log in</a>
+        {% endif %}
     </div>
 </body>
 </html>

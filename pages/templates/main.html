@@ -7,13 +7,6 @@
 </head>
 <body>
     {% include 'topbar.html' %}
-        {% for item in all_items %}
-    <div class="item-card">
-        <img src="{{ Post_Item.image.url }}" alt="{{ item.title }}">
-        <h2>{{ item.title }}</h2>
 
-        <button>Купити</button>
-    </div>
-    {% endfor %}
 </body>
 </html>
