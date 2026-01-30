@@ -1,16 +1,20 @@
-from django.views.generic import FormView, CreateView, ListView, TemplateView
-from .forms import *
-from .models import *
-from django.urls import reverse_lazy
-from django.shortcuts import redirect, get_object_or_404
-from django.shortcuts import render, redirect 
-from django.contrib.auth import authenticate, login, logout
+from django.views.generic import ListView, FormView, CreateView
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
+from .forms import LoginForm
+from .models import PostItem, Chat, Message
+
+
 class LoginView(FormView):
     template_name = 'login.html'
     form_class = LoginForm
     success_url = reverse_lazy('main_page')
+
     def form_valid(self, form):
         username = form.cleaned_data['username']
         password = form.cleaned_data['password']
@@ -22,37 +26,55 @@ class LoginView(FormView):
             form.add_error(None, 'Невірний логін або пароль')
             return self.form_invalid(form)
 
-
 class RegistrateView(CreateView):
     template_name = 'registrate.html'
     form_class = UserCreationForm
     success_url = reverse_lazy('login')
 
-class ItemListView(TemplateView):
-    template_name = 'main.html'
-class ChatsListView(TemplateView):
-    template_name = 'chats.html'
-
-@login_required
-def delete_item(request, pk):
-    item = get_object_or_404(Post_Item, pk=pk)
-    if request.method == "POST":
-        item.delete()
-    return redirect('edit_item_list')
-
 def LogoutView(request):
     logout(request)
     return redirect('login')
 
-def chat_users_list(request):
-    query = request.GET.get("q", "").strip()
-    users = User.objects.all().order_by("-id")
-    if query:
-        users = users.filter(
-            username__icontains=query
-        )
+
+class ItemListView(ListView):
+    model = PostItem
+    template_name = "main.html"
+    context_object_name = "posts"
+#//////////////////////////////////////////////////////////////
+
+@login_required
+def delete_item(request, pk):
+    PostItem.objects.filter(pk=pk, author=request.user).delete()
+    return redirect("main_page")
+
+@login_required
+def chats_view(request, user_id=None):
+    users = User.objects.exclude(id=request.user.id).order_by("username")
+    chat = None
+    messages = None
+    other_user = None
+
+    if user_id is not None:
+        other_user = get_object_or_404(User, id=user_id)
+        if request.user.id < other_user.id:
+            user1 = request.user
+            user2 = other_user
+        else:
+            user1 = other_user
+            user2 = request.user
+
+        chat, _ = Chat.objects.get_or_create(user1=user1, user2=user2)
+        messages = chat.messages.order_by("created_at")
+
+        if request.method == "POST":
+            text = request.POST.get("text", "").strip()
+            if text:
+                Message.objects.create(chat=chat, sender=request.user, text=text)
+            return redirect("chats", user_id=other_user.id)
 
     return render(request, "chats.html", {
         "users": users,
-        "query": query
+        "chat": chat,
+        "messages": messages,
+        "other_user": other_user,
     })
