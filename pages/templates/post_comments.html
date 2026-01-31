@@ -99,6 +99,11 @@
                     {{ comment.created_at|date:"d.m.Y H:i" }}
                 </div>
             </div>
+            {%if comment.author == request.user %}
+            <div>
+                <a href="{% url 'delete_comment' comment.id %}">Видалити коментар</a>
+            </div>
+            {% endif %}
         {% empty %}
             <p>Коментарів поки немає</p>
         {% endfor %}

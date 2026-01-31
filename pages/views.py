@@ -41,10 +41,17 @@ class ItemListView(ListView):
     context_object_name = "posts"
 #//////////////////////////////////////////////////////////////
 
-# @login_required
-# def delete_item(request, pk):
-#     PostItem.objects.filter(pk=pk, author=request.user).delete()
-#     return redirect("main_page")
+@login_required
+def delete_item(request, pk):
+    PostItem.objects.filter(pk=pk, author=request.user).delete()
+    return redirect("user_posts")
+
+@login_required
+def delete_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk, author=request.user)
+    post_id = comment.post.id
+    comment.delete()
+    return redirect("post_comments", post_id=post_id)
 
 @login_required
 def chats_view(request, user_id=None):
@@ -52,7 +59,6 @@ def chats_view(request, user_id=None):
     chat = None
     messages = None
     other_user = None
-
     if user_id is not None:
         other_user = get_object_or_404(User, id=user_id)
         if request.user.id < other_user.id:
@@ -61,7 +67,6 @@ def chats_view(request, user_id=None):
         else:
             user1 = other_user
             user2 = request.user
-
         chat, _ = Chat.objects.get_or_create(user1=user1, user2=user2)
         messages = chat.messages.order_by("created_at")
 
@@ -69,16 +74,10 @@ def chats_view(request, user_id=None):
             text = request.POST.get("text", "").strip()
             if text:
                 Message.objects.create(chat=chat, sender=request.user, text=text)
-            return redirect("chats", user_id=other_user.id)
+            return redirect("chat_detail", user_id=other_user.id)
 
-    return render(request, "chats.html", {
-        "users": users,
-        "chat": chat,
-        "messages": messages,
-        "other_user": other_user,
-    })
+    return render(request, "chats.html", {"users": users,"chat": chat,"messages": messages,"other_user": other_user,})
 
-@login_required
 def post_coments_view(request, post_id):
     post = get_object_or_404(PostItem, id=post_id)
     comments = post.comments.order_by("created_at")
@@ -86,13 +85,8 @@ def post_coments_view(request, post_id):
     if request.method == "POST":
         text = request.POST.get("text", "").strip()
         if text:
-            Comment.objects.create(
-                post=post,
-                author=request.user,
-                text=text
-            )
+            Comment.objects.create(post=post,author=request.user,text=text)
         return redirect("post_comments", post_id=post.id)
-
     return render(request, "post_comments.html", {
         "post": post,
         "comments": comments
@@ -110,5 +104,9 @@ def create_post(request):
             return redirect("main_page")
     else:
         form = PostItemForm()
-
     return render(request, "create_post.html", {"form": form})
+
+@login_required
+def my_posts_view(request):
+    posts = PostItem.objects.filter(author=request.user).order_by("-created_at")
+    return render(request, "my_posts.html", {"posts": posts})

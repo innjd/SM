@@ -120,7 +120,6 @@
                 <div class="message {% if message.sender == request.user %}me{% else %}other{% endif %}">
                         <div class="message">
                             {{ message.text }}
-                        <span class="timestamp">{{ message.created_at }}</span>
                         </div>
             <span class="timestamp">{{ message.created_at|date:"d.m.Y H:i" }}</span>
                 </div>
