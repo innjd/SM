@@ -106,7 +106,7 @@
         <h3>Чати</h3>
         {% for user in users %}
             <div class="chat-user">
-                <a href="{% url 'chats' user.id %}">{{ user.username }}</a>
+                <a href="{% url 'chat_detail' user.id %}">{{ user.username }}</a>
             </div>
         {% empty %}
             <div class="chat-user">Немає користувачів</div>
