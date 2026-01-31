@@ -1,13 +1,12 @@
 from django.views.generic import ListView, FormView, CreateView
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
-from .forms import LoginForm
-from .models import PostItem, Chat, Message
+from .forms import *
+from .models import *
 
 
 class LoginView(FormView):
@@ -42,10 +41,10 @@ class ItemListView(ListView):
     context_object_name = "posts"
 #//////////////////////////////////////////////////////////////
 
-@login_required
-def delete_item(request, pk):
-    PostItem.objects.filter(pk=pk, author=request.user).delete()
-    return redirect("main_page")
+# @login_required
+# def delete_item(request, pk):
+#     PostItem.objects.filter(pk=pk, author=request.user).delete()
+#     return redirect("main_page")
 
 @login_required
 def chats_view(request, user_id=None):
@@ -78,3 +77,38 @@ def chats_view(request, user_id=None):
         "messages": messages,
         "other_user": other_user,
     })
+
+@login_required
+def post_coments_view(request, post_id):
+    post = get_object_or_404(PostItem, id=post_id)
+    comments = post.comments.order_by("created_at")
+
+    if request.method == "POST":
+        text = request.POST.get("text", "").strip()
+        if text:
+            Comment.objects.create(
+                post=post,
+                author=request.user,
+                text=text
+            )
+        return redirect("post_comments", post_id=post.id)
+
+    return render(request, "post_comments.html", {
+        "post": post,
+        "comments": comments
+    })
+
+
+@login_required
+def create_post(request):
+    if request.method == "POST":
+        form = PostItemForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect("main_page")
+    else:
+        form = PostItemForm()
+
+    return render(request, "create_post.html", {"form": form})

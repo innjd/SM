@@ -98,7 +98,6 @@
     </style>
 </head>
 <body>
-
 {% include "topbar.html" %}
 
 <div class="chat-page">
@@ -117,26 +116,28 @@
     <div class="chat-content">
         {% if chat %}
             <div class="messages">
-                {% for message in messages %}
-                    <div class="message {% if message.sender == request.user %}me{% else %}other{% endif %}">
-                        {{ message.text }}
-                    </div>
+            {% for message in messages %}
+                <div class="message {% if message.sender == request.user %}me{% else %}other{% endif %}">
+                        <div class="message">
+                            {{ message.text }}
+                        <span class="timestamp">{{ message.created_at }}</span>
+                        </div>
+            <span class="timestamp">{{ message.created_at|date:"d.m.Y H:i" }}</span>
+                </div>
                 {% endfor %}
             </div>
 
             <div class="chat-input">
-                <form method="post">
+            <form method="post">
                     {% csrf_token %}
-                    <input type="text" name="text" placeholder="Написати повідомлення..." required>
+                <input type="text" name="text" placeholder="Написати повідомлення..." required>
                     <button type="submit">Відправити</button>
-                </form>
-            </div>
+            </form>
+        </div>
         {% else %}
-            <div class="chat-placeholder">Оберіть користувача для початку чату</div>
+            <div class="chat-placeholder">чат не вибрано</div>
         {% endif %}
     </div>
-
 </div>
-
 </body>
 </html>

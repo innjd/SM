@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Коментарі</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .post {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .comments {
+            margin-top: 20px;
+        }
+
+        .comment {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .comment.me {
+            background: #ffecec;
+        }
+
+        .comment-author {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .timestamp {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .comment-form {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .comment-form input {
+            flex: 1;
+            padding: 8px;
+        }
+
+        .comment-form button {
+            padding: 8px 14px;
+            background: #d50d0d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+{% include "topbar.html" %}
+
+<div class="container">
+
+    <div class="post">
+        <strong>{{ post.author.username }}</strong><br>
+        {{ post.text }}<br>
+        <span class="timestamp">
+            {{ post.created_at|date:"d.m.Y H:i" }}
+        </span>
+    </div>
+
+    <div class="comments">
+
+        {% for comment in comments %}
+            <div class="comment {% if comment.author == request.user %}me{% endif %}">
+                <div class="comment-author">
+                    {{ comment.author.username }}
+                </div>
+
+                {{ comment.text }}
+
+                <div class="timestamp">
+                    {{ comment.created_at|date:"d.m.Y H:i" }}
+                </div>
+            </div>
+        {% empty %}
+            <p>Коментарів поки немає</p>
+        {% endfor %}
+    </div>
+    <form method="post" class="comment-form">
+        {% csrf_token %}
+        <input type="text" name="text" placeholder="Написати коментар..." required>
+        <button type="submit">Надіслати</button>
+    </form>
+
+</div>
+
+</body>
+</html>

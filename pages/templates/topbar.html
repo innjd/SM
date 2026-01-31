@@ -34,6 +34,12 @@ background-color: #b80a0a;
         {% else %}
             <a href="{% url 'login' %}">Log in</a>
         {% endif %}
+        {% if user.is_authenticated %}
+
+        {%else%}
+        <a  href="{% url 'registrate' %}">Sign up</a>
+        {%endif%}
+        <a href="{%url 'create_post'%}">+ Create Post</a>
         <!-- перемикач тем -->
     </div>
 </body>
