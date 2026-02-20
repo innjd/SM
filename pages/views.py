@@ -1,4 +1,4 @@
-from django.views.generic import ListView, FormView, CreateView
+from django.views.generic import ListView, FormView, CreateView, UpdateView
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -61,23 +61,16 @@ def chats_view(request, user_id=None):
     other_user = None
     if user_id is not None:
         other_user = get_object_or_404(User, id=user_id)
-        if request.user.id < other_user.id:
-            user1 = request.user
-            user2 = other_user
-        else:
-            user1 = other_user
-            user2 = request.user
+        user1 = request.user
+        user2 = other_user
         chat, _ = Chat.objects.get_or_create(user1=user1, user2=user2)
         messages = chat.messages.order_by("created_at")
-
         if request.method == "POST":
             text = request.POST.get("text", "").strip()
             if text:
                 Message.objects.create(chat=chat, sender=request.user, text=text)
             return redirect("chat_detail", user_id=other_user.id)
-
     return render(request, "chats.html", {"users": users,"chat": chat,"messages": messages,"other_user": other_user,})
-
 def post_coments_view(request, post_id):
     post = get_object_or_404(PostItem, id=post_id)
     comments = post.comments.order_by("created_at")
@@ -87,12 +80,7 @@ def post_coments_view(request, post_id):
         if text:
             Comment.objects.create(post=post,author=request.user,text=text)
         return redirect("post_comments", post_id=post.id)
-    return render(request, "post_comments.html", {
-        "post": post,
-        "comments": comments
-    })
-
-
+    return render(request, "post_comments.html", {"post": post,"comments": comments,})
 @login_required
 def create_post(request):
     if request.method == "POST":
@@ -110,3 +98,34 @@ def create_post(request):
 def my_posts_view(request):
     posts = PostItem.objects.filter(author=request.user).order_by("-created_at")
     return render(request, "my_posts.html", {"posts": posts})
+
+@login_required
+def like_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    like, created = CommentLike.objects.get_or_create(comment=comment,user=request.user)
+    if not created:
+        like.delete()
+    return redirect("post_comments", post_id=comment.post.id)
+@login_required
+def like_post(request, post_id):
+    post = get_object_or_404(PostItem, id=post_id)
+    like, created = Like.objects.get_or_create(post=post,user=request.user)
+    if not created:
+        like.delete()
+    return redirect("main_page")
+
+@login_required
+def profile_view(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    profile = getattr(user, "profile", None)
+    posts = user.posts.order_by("-created_at")
+    return render(request, "profile.html", {"profile": profile,"posts": posts,"viewed_user": user})
+# class ProfileEditView(UpdateView):
+#     model = Profile
+#     form_class = ProfileEditForm
+#     template_name = "edit_profile.html"
+#     success_url = reverse_lazy("main_page")
+
+#     def get_object(self, queryset=None):
+#         profile, _ = Profile.objects.get_or_create(user=self.request.user)
+#         return profile  

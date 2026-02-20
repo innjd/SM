@@ -2,7 +2,6 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Вхід</title>
     <style>
         body {
             display: flex;
@@ -32,12 +31,12 @@
 <form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Увійти</button>
+    <button type="submit">увійти</button>
 </form>
 {% if error %}
     <p style="color:red;">{{ error }}</p>
 {% endif %}
-<a>Не маєте аккаунт?</a>
+<a>Не має аккаунта?</a>
 <a href = "{% url 'registrate' %}">Зареєструватись</a>
    </div>
 </body

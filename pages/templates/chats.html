@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -25,7 +26,7 @@
         .chat-list h3 {
             padding: 12px;
             margin: 0;
-            background: #d50d0d;
+            background: #3f0dd5;
             color: white;
             text-align: center;
         }
@@ -39,10 +40,6 @@
             text-decoration: none;
             color: black;
             display: block;
-        }
-
-        .chat-user:hover {
-            background: #e6e6e6;
         }
 
         .chat-content {
@@ -66,7 +63,7 @@
         }
 
         .message.me {
-            background: #d50d0d;
+            background: #3f0dd5;
             color: white;
             margin-left: auto;
         }
@@ -77,20 +74,20 @@
             margin-right: auto;
         }
 
-        .chat-input {
+        .chatinput {
             margin-top: 10px;
         }
 
-        .chat-input input {
+        .chatinput input {
             width: 80%;
             padding: 8px;
             font-size: 16px;
         }
 
-        .chat-input button {
+        .chatinput button {
             padding: 8px 12px;
             margin-left: 6px;
-            background: #d50d0d;
+            background: #9507d2;
             color: white;
             border: none;
             cursor: pointer;
@@ -101,23 +98,32 @@
 {% include "topbar.html" %}
 
 <div class="chat-page">
+<div class="chat-list">
+    <h3>Чати</h3>
+    {% for user in users %}
+        <div class="chat-user">
+            {% if user.profile_icon %}
+                <a href="{% url 'profile' user.id %}">
+                    <img src="{{ user.profile_icon.url }}" width="32" style="border-radius: 50%;">
+                </a>
+            {% else %}
+                <a href="{% url 'profile' user.id %}">
+                    <img src="{% static 'basic_icon.png' %}" width="32" style="border-radius: 50%;">
+                </a>
+            {% endif %}
+            <a href="{% url 'chat_detail' user.id %}">{{ user.username }}</a>
+        </div>
+    {% empty %}
+        <div class="chat-user">нема користувачів</div>
+    {% endfor %}
+</div>
 
-    <div class="chat-list">
-        <h3>Чати</h3>
-        {% for user in users %}
-            <div class="chat-user">
-                <a href="{% url 'chat_detail' user.id %}">{{ user.username }}</a>
-            </div>
-        {% empty %}
-            <div class="chat-user">Немає користувачів</div>
-        {% endfor %}
-    </div>
 
     <div class="chat-content">
         {% if chat %}
             <div class="messages">
             {% for message in messages %}
-                <div class="message {% if message.sender == request.user %}me{% else %}other{% endif %}">
+                <div class="message {% if message.sender == request.user %}me{% else %}other{% endif %}"> 
                         <div class="message">
                             {{ message.text }}
                         </div>
@@ -126,7 +132,7 @@
                 {% endfor %}
             </div>
 
-            <div class="chat-input">
+            <div class="chatinput">
             <form method="post">
                     {% csrf_token %}
                 <input type="text" name="text" placeholder="Написати повідомлення..." required>
